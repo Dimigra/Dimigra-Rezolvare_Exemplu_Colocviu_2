@@ -21,15 +21,33 @@ public class PracticalTest02MainActivity extends AppCompatActivity {
     Button button1;
     Button button2;
 
+    ServerThread serverTh = null;
+
     private my_ButtonClickListener my_buttonClickListener = new my_ButtonClickListener();
     private class my_ButtonClickListener implements Button.OnClickListener {
         @Override
         public void onClick(View view) {
 
             switch (view.getId()) {
+                // Server
                 case R.id.button1:
-                    // TODO
                     Log.e(Constants.TAG, "[GUI] Button1 pressed");
+
+                    String port = text1.getText().toString();
+                    if (port == null || port.isEmpty()) {
+                        Log.e(Constants.TAG, "[GUI] ERROR: Port empty");
+                        return;
+                    }
+
+                    serverTh = new ServerThread(Integer.parseInt(port));
+                    if (serverTh.getServerSocket() == null) {
+                        Log.e(Constants.TAG, "[GUI] ERROR: Server initialization failed");
+                        return;
+                    }
+
+                    serverTh.start();
+                    Log.e(Constants.TAG, "[GUI] Server started on port " + Integer.parseInt(port));
+
                     break;
 
                 case R.id.button2:
@@ -61,7 +79,9 @@ public class PracticalTest02MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        // TODO
+        if (serverTh != null) {
+            serverTh.stopThread();
+        }
         super.onDestroy();
     }
 }
