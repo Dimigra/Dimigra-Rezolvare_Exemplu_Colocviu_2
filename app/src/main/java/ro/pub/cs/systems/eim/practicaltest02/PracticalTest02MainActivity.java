@@ -22,18 +22,25 @@ public class PracticalTest02MainActivity extends AppCompatActivity {
     Button button2;
 
     ServerThread serverTh = null;
+    ClientThread clientTh = null;
 
     private my_ButtonClickListener my_buttonClickListener = new my_ButtonClickListener();
     private class my_ButtonClickListener implements Button.OnClickListener {
         @Override
         public void onClick(View view) {
 
+            Log.e(Constants.TAG, "[GUI] -------------------------");
+            String port;
+            String address;
+            String city;
+            String typeInfo;
+
             switch (view.getId()) {
-                // Server
+                    // Server
                 case R.id.button1:
                     Log.e(Constants.TAG, "[GUI] Button1 pressed");
 
-                    String port = text1.getText().toString();
+                    port = text1.getText().toString();
                     if (port == null || port.isEmpty()) {
                         Log.e(Constants.TAG, "[GUI] ERROR: Port empty");
                         return;
@@ -46,13 +53,42 @@ public class PracticalTest02MainActivity extends AppCompatActivity {
                     }
 
                     serverTh.start();
-                    Log.e(Constants.TAG, "[GUI] Server started on port " + Integer.parseInt(port));
+                    Log.e(Constants.TAG, "[GUI] Server started on port " + port);
 
                     break;
 
+                    // Client
                 case R.id.button2:
-                    // TODO
                     Log.e(Constants.TAG, "[GUI] Button2 pressed");
+
+                    address = text2.getText().toString();
+                    port = text3.getText().toString();
+                    city = text4.getText().toString();
+                    typeInfo = spinner1.getSelectedItem().toString();
+
+                    if (address == null || address.isEmpty()) {
+                        Log.e(Constants.TAG, "[GUI] ERROR: Address empty");
+                        return;
+                    }
+                    if (port == null || port.isEmpty()) {
+                        Log.e(Constants.TAG, "[GUI] ERROR: Port empty");
+                        return;
+                    }
+                    if (city == null || city.isEmpty()) {
+                        Log.e(Constants.TAG, "[GUI] ERROR: City empty");
+                        return;
+                    }
+
+
+                    clientTh = new ClientThread(
+                            address, Integer.parseInt(port), city, typeInfo, text_debug
+                    );
+                    clientTh.start();
+                    Log.e(Constants.TAG, "[GUI] Client started on port-" + port +
+                            "  address-" + address +
+                            "  city-" + city +
+                            "  type info-" + typeInfo);
+
                     break;
             }
         }
