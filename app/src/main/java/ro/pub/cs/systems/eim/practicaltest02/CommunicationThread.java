@@ -66,7 +66,40 @@ public class CommunicationThread extends Thread {
                     "     City-" + city +
                     "     Type-" + informationType);
 
-            String result = "TODO123";
+
+
+
+            WeatherForecastInformation weather = null;
+            HashMap<String, WeatherForecastInformation> data = serverThread.getData();
+            String result = "";
+
+            // Cache
+            if (data.containsKey(city)) {
+                Log.i(Constants.TAG, "[COMMUNICATION THREAD] Getting the information from the cache...");
+                weather = data.get(city);
+            } else {
+                // HTTP
+                HttpClient httpClient = new DefaultHttpClient();
+                HttpGet httpGet = new HttpGet(Constants.WEB_SERVICE_ADDRESS+city);
+                ResponseHandler<String> responseHandler = new BasicResponseHandler();
+                String pageSourceCode = httpClient.execute(httpGet, responseHandler);
+                if (pageSourceCode == null) {
+                    Log.e(Constants.TAG, "[COMMUNICATION THREAD] Error getting the information from the webservice!");
+                    return;
+                }
+                Log.e(Constants.TAG, "[COMMUNICATION THREAD] Page source code: ???" + pageSourceCode + "???");
+
+                // JSON
+                JSONObject json_res = new JSONObject(pageSourceCode);
+                JSONArray jsonArray = json_res.getJSONArray("RESULTS");
+                for (int index = 0; index < jsonArray.length(); index++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(index);
+                    result += jsonObject.getString("name");
+                    result += jsonObject.getString("c");
+                    result += "------------------------------";
+                }
+            }
+
             printWriter.println(result);
             printWriter.flush();
             Log.e(Constants.TAG, "[COMMUNICATION THREAD] Sent to client: " + result);
@@ -76,6 +109,8 @@ public class CommunicationThread extends Thread {
             if (Constants.DEBUG) {
                 ioException.printStackTrace();
             }
+        } catch (JSONException e) {
+            e.printStackTrace();
         } finally {
             if (socket != null) {
                 try {
