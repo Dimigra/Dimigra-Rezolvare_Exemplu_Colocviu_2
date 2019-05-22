@@ -50,8 +50,16 @@ public class ClientThread extends Thread {
             printWriter.println(informationType);
             printWriter.flush();
 
-            final String result = "TODO";
-            Log.e(Constants.TAG, "[CLIENT THREAD] data: " + result);
+            Log.e(Constants.TAG, "[CLIENT THREAD] request sent");
+
+            String weatherInformation = "";
+            String aux;
+            while ((aux = bufferedReader.readLine()) != null) {
+                weatherInformation += aux;
+            }
+
+            final String result = weatherInformation;
+            Log.e(Constants.TAG, "[CLIENT THREAD] received data: " + result);
             weatherForecastTextView.post(new Runnable() {
                 @Override
                 public void run() {

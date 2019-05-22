@@ -46,7 +46,8 @@ public class ServerThread extends Thread {
             }
 
             Log.e(Constants.TAG, "[ServeThread] New connection");
-            // TODO
+            CommunicationThread communicationThread = new CommunicationThread(this, socket);
+            communicationThread.start();
         }
     }
 
